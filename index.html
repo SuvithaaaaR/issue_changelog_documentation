@@ -11,37 +11,7 @@
     <header class="header">
       <div class="header-content">
         <div class="logo">
-          <svg
-            class="logo-icon"
-            viewBox="0 0 50 50"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="5"
-              y="5"
-              width="12"
-              height="40"
-              fill="#4A90E2"
-              transform="skewY(-10)"
-            />
-            <rect
-              x="20"
-              y="5"
-              width="12"
-              height="40"
-              fill="#F5A623"
-              transform="skewY(-10)"
-            />
-            <rect
-              x="35"
-              y="5"
-              width="12"
-              height="40"
-              fill="#7ED321"
-              transform="skewY(-10)"
-            />
-          </svg>
-          <span class="logo-text">K15t</span>
+          <img src="innoov.png" alt="Innoov Logo" class="logo-icon" />
         </div>
 
         <nav class="header-nav" id="headerNav">
@@ -49,6 +19,31 @@
         </nav>
 
         <div class="header-actions">
+          <div class="dropdown version-dropdown">
+            <button class="dropdown-btn version-btn" id="versionBtn">
+              Version 2.5.0 ▼
+            </button>
+            <div class="dropdown-menu version-menu" id="versionMenu">
+              <a href="#" class="dropdown-item active" data-version="2.5.0"
+                >Version 2.5.0 (Latest)</a
+              >
+              <a href="#" class="dropdown-item" data-version="2.4.5"
+                >Version 2.4.5</a
+              >
+              <a href="#" class="dropdown-item" data-version="2.4.0"
+                >Version 2.4.0</a
+              >
+              <a href="#" class="dropdown-item" data-version="2.3.2"
+                >Version 2.3.2</a
+              >
+              <a href="#" class="dropdown-item" data-version="2.3.0"
+                >Version 2.3.0</a
+              >
+              <a href="#" class="dropdown-item" data-version="2.2.0"
+                >Version 2.2.0</a
+              >
+            </div>
+          </div>
           <div class="dropdown">
             <button class="dropdown-btn">Cloud ▼</button>
           </div>
@@ -72,6 +67,61 @@
         </div>
       </div>
     </header>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="searchModal">
+      <div class="search-modal-content">
+        <div class="search-input-wrapper">
+          <svg
+            class="search-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <circle
+              cx="9"
+              cy="9"
+              r="6"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M14 14L18 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="Search documentation... (Press '/' to focus)"
+            autocomplete="off"
+          />
+          <button
+            class="search-close"
+            id="searchClose"
+            aria-label="Close search"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M5 5L15 15M15 5L5 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="search-results" id="searchResults">
+          <div class="search-hint">
+            Start typing to search across all sections...
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="main-container">
       <!-- Sidebar -->
