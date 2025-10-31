@@ -18,6 +18,51 @@
   --sidebar-width: 280px;
   --toc-width: 240px;
   --header-height: 64px;
+  /* Atlassian Design System – Typography tokens (approximate) */
+  --font-family-base: "Charlie Text", "Charlie Sans", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    "Liberation Sans", sans-serif;
+  --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --font-size-body: 14px; /* ADS product body */
+  --line-height-body: 1.6;
+  --h1-size: 28px; /* Heading XL */
+  --h1-line: 1.25;
+  --h1-weight: 700;
+  --h2-size: 24px; /* Heading L */
+  --h2-line: 1.3;
+  --h2-weight: 700;
+  --h3-size: 20px; /* Heading M */
+  --h3-line: 1.4;
+  --h3-weight: 600;
+  --h4-size: 18px; /* Heading S */
+  --h4-line: 1.4;
+  --h4-weight: 600;
+
+  /* Atlassian spacing scale (approximate) */
+  --space-050: 2px;
+  --space-100: 4px;
+  --space-200: 8px;
+  --space-300: 12px;
+  --space-400: 16px;
+  --space-500: 20px;
+  --space-600: 24px;
+  --space-800: 32px;
+
+  /* Radii */
+  --radius-100: 3px;
+  --radius-200: 4px;
+  --radius-300: 8px;
+
+  /* Elevation */
+  --elevation-100: 0 1px 1px rgba(9, 30, 66, 0.15);
+  --elevation-200: 0 1px 3px rgba(9, 30, 66, 0.2);
+
+  /* Links & focus */
+  --link: #0052cc;
+  --link-hover: #0747a6;
+  --link-active: #172b4d;
+  --focus-ring: #4c9aff;
 }
 
 body {
@@ -28,6 +73,31 @@ body {
   line-height: 1.6;
   background-color: var(--bg-white);
   overflow-x: hidden;
+}
+body {
+  font-family: var(--font-family-base);
+  color: var(--text-dark);
+  line-height: var(--line-height-body);
+  font-size: var(--font-size-body);
+  background-color: var(--bg-white);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global link styles (ADS-like) */
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+a:active {
+  color: var(--link-active);
 }
 
 /* Selection styling */
@@ -123,9 +193,9 @@ body {
 }
 
 .dropdown-btn {
-  padding: 8px 16px;
+  padding: var(--space-200) var(--space-400);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: var(--radius-200);
   background-color: var(--bg-white);
   color: var(--text-dark);
   font-size: 14px;
@@ -136,6 +206,14 @@ body {
 
 .dropdown-btn:hover {
   background-color: var(--bg-light);
+}
+
+.dropdown-btn:focus-visible,
+.save-pdf-btn:focus-visible,
+.search-btn:focus-visible,
+.sidebar-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Version Dropdown */
@@ -206,6 +284,22 @@ body {
 .dropdown-item.active::after {
   content: " ✓";
   float: right;
+}
+
+.save-pdf-btn {
+  padding: var(--space-200) var(--space-300);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-200);
+  background-color: #f5f7fa;
+  color: var(--text-dark);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.08s;
+}
+
+.save-pdf-btn:hover {
+  background-color: #eef4ff;
+  transform: translateY(-1px);
 }
 
 .search-btn {
@@ -423,6 +517,29 @@ body {
   padding: 0 16px;
 }
 
+/* Sidebar product header (inspired by Twilio's 'Programmable Messaging' pill) */
+.sidebar-product-card {
+  margin: 0 0 16px 0;
+  padding: 14px 12px;
+  border-radius: 8px;
+  background: #eceff3; /* light grey card, subtly different from sidebar */
+  color: var(--text-dark);
+  font-weight: 700;
+  font-size: 15px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--elevation-100);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sidebar-product-card:hover {
+  background: #f1f3f6; /* keep hover subtle, no color shift to blue */
+}
+
+.sidebar-product-title {
+  line-height: 1.35;
+}
+
 .nav-section {
   margin-bottom: 8px;
 }
@@ -431,16 +548,21 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: var(--space-200) var(--space-300);
   font-size: 14px;
   font-weight: 600;
   color: var(--text-dark);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-200);
   transition: background-color 0.2s;
   user-select: none;
   word-wrap: break-word;
   line-height: 1.4;
+}
+
+.nav-section-title:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .nav-section-title:hover {
@@ -495,6 +617,11 @@ body {
   transition: all 0.2s;
   margin-bottom: 2px;
   position: relative;
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .nav-item::before {
@@ -607,35 +734,197 @@ body {
 
 /* Article */
 .article-title {
-  font-size: 32px;
-  font-weight: 600;
+  font-size: var(--h1-size);
+  font-weight: var(--h1-weight);
   color: var(--text-dark);
-  margin-bottom: 16px;
-  line-height: 1.2;
+  margin-bottom: var(--space-300);
+  line-height: var(--h1-line);
 }
 
 .article-description {
   font-size: 16px;
   color: var(--text-medium);
-  margin-bottom: 32px;
+  margin-bottom: var(--space-600);
   line-height: 1.6;
 }
 
 .article-content {
-  font-size: 15px;
-  line-height: 1.7;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+/* Hero (Twilio-like) */
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  align-items: center;
+  padding: 12px 0 24px 0;
+  margin-bottom: 24px;
+}
+
+.hero-title {
+  font-size: 40px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: var(--text-medium);
+  margin-bottom: 20px;
+}
+
+.hero-cta-group {
+  display: grid;
+  row-gap: 12px;
+  max-width: 380px;
+}
+
+.hero-cta {
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  box-shadow: var(--elevation-100);
+}
+
+.hero-cta:hover {
+  background: var(--bg-light);
+}
+
+.hero-cta-arrow {
+  color: var(--text-light);
+  margin-left: 8px;
+}
+
+.hero-code-card {
+  position: relative;
+  background: #0d1b2a;
+  color: #dbe2ef;
+  border-radius: 10px;
+  padding: 12px 12px 36px 12px;
+  box-shadow: 0 12px 24px rgba(13, 27, 42, 0.25);
+}
+
+.hero-image-card {
+  position: relative;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 8px 8px 24px 8px;
+  box-shadow: var(--elevation-200);
+}
+
+.hero-image-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Twilio-style numbered callout badges */
+.hero-callout {
+  position: absolute;
+  cursor: default;
+  z-index: 40;
+}
+
+.hero-callout-inner {
+  position: relative;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 100, 130, 0.9) 0%,
+    rgba(255, 70, 90, 0.95) 100%
+  );
+  box-shadow: 0 4px 14px rgba(255, 70, 90, 0.35),
+    0 0 0 4px rgba(255, 100, 130, 0.15), 0 0 0 8px rgba(255, 100, 130, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-callout 2s ease-in-out infinite;
+}
+
+.hero-callout-number {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse-callout {
+  0%,
+  100% {
+    box-shadow: 0 4px 14px rgba(255, 70, 90, 0.35),
+      0 0 0 4px rgba(255, 100, 130, 0.15), 0 0 0 8px rgba(255, 100, 130, 0.08);
+  }
+  50% {
+    box-shadow: 0 4px 18px rgba(255, 70, 90, 0.45),
+      0 0 0 6px rgba(255, 100, 130, 0.2), 0 0 0 12px rgba(255, 100, 130, 0.12);
+  }
+}
+
+.hero-code-header {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #8fb3ff;
+  text-transform: uppercase;
+  margin: 8px 8px 0 8px;
+}
+
+.hero-pre {
+  margin: 8px;
+  overflow: auto;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px;
+  max-height: 360px;
+}
+
+.hero-examples {
+  display: inline-block;
+  margin: 8px 8px 0 8px;
+  color: #a1c5ff;
+}
+
+.hero-bubble {
+  position: absolute;
+  right: 12px;
+  bottom: -10px;
+  background: #ffffff;
+  color: var(--text-dark);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Info Box */
 .info-box {
   background-color: var(--info-bg);
   border-left: 4px solid var(--info-border);
-  border-radius: 4px;
-  padding: 16px 20px;
-  margin: 24px 0;
+  border-radius: var(--radius-200);
+  padding: var(--space-300) var(--space-400);
+  margin: var(--space-400) 0;
   display: flex;
   gap: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--elevation-100);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
@@ -690,7 +979,7 @@ body {
 
 /* Content Headings */
 .content-heading {
-  font-weight: 600;
+  font-weight: var(--h2-weight);
   color: var(--text-dark);
   margin-top: 32px;
   margin-bottom: 16px;
@@ -700,7 +989,8 @@ body {
 }
 
 h2.content-heading {
-  font-size: 24px;
+  font-size: var(--h2-size);
+  line-height: var(--h2-line);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
   padding-left: 12px;
@@ -718,7 +1008,8 @@ h2.content-heading::before {
 }
 
 h3.content-heading {
-  font-size: 20px;
+  font-size: var(--h3-size);
+  line-height: var(--h3-line);
   padding-left: 8px;
   border-left: 3px solid var(--border-color);
   transition: border-color 0.2s;
@@ -729,18 +1020,20 @@ h3.content-heading:hover {
 }
 
 h4.content-heading {
-  font-size: 18px;
+  font-size: var(--h4-size);
+  line-height: var(--h4-line);
+  font-weight: var(--h4-weight);
 }
 
 /* Content Lists */
 .content-list {
-  margin: 20px 0;
+  margin: var(--space-400) 0;
   padding-left: 24px;
 }
 
 .content-list li {
-  margin-bottom: 12px;
-  line-height: 1.6;
+  margin-bottom: 16px;
+  line-height: var(--line-height-body);
   color: var(--text-dark);
   position: relative;
   padding-left: 8px;
@@ -760,12 +1053,12 @@ h4.content-heading {
 .warning-box {
   background-color: #fff4e5;
   border-left: 4px solid #ff991f;
-  border-radius: 4px;
-  padding: 16px 20px;
-  margin: 24px 0;
+  border-radius: var(--radius-200);
+  padding: var(--space-300) var(--space-400);
+  margin: var(--space-400) 0;
   display: flex;
   gap: 12px;
-  box-shadow: 0 1px 3px rgba(255, 153, 31, 0.1);
+  box-shadow: var(--elevation-100);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
@@ -806,17 +1099,43 @@ h4.content-heading {
 
 /* Image Content */
 .content-image {
-  margin: 32px 0;
-  border-radius: 8px;
+  margin: var(--space-800) 0;
+  border-radius: var(--radius-300);
   overflow: hidden;
   border: 1px solid var(--border-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--elevation-200);
 }
 
 .content-image img {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Code blocks adopt ADS mono stack */
+pre,
+code,
+pre code {
+  font-family: var(--font-family-code);
+  font-size: 13px;
+}
+
+/* Copy code button style */
+.copy-code-btn {
+  position: absolute;
+  top: var(--space-200);
+  right: var(--space-200);
+  padding: var(--space-100) var(--space-200);
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  color: var(--text-dark);
+  border-radius: var(--radius-100);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.copy-code-btn:hover {
+  background: var(--bg-light);
 }
 
 /* Table of Contents */
@@ -852,7 +1171,7 @@ h4.content-heading {
   align-items: flex-start;
   gap: 8px;
   padding: 6px 0;
-  font-size: 13px;
+  font-size: 13px; /* smaller supporting text scale */
   color: var(--text-medium);
   text-decoration: none;
   transition: color 0.2s;
@@ -890,6 +1209,11 @@ h4.content-heading {
 
 .toc-link.active::before {
   height: 100%;
+}
+
+.toc-link:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Responsive Design */
@@ -967,6 +1291,17 @@ h4.content-heading {
     margin: 0;
     max-width: 100%;
     padding: 20px;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+  }
+
+  /* Code blocks adopt ADS mono stack */
+  pre,
+  code,
+  pre code {
+    font-family: var(--font-family-code);
+    font-size: 13px;
   }
 
   .info-box,

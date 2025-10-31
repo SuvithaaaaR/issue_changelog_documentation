@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
   try {
     initializeHeader();
     initializeSidebar();
-    // Load initial content (first section)
-    loadSectionContent("app-overview");
+    // Load initial content – show Issue Changelog hero first
+    loadSectionContent("issue-changelog");
     initializeSidebarToggle();
     createBackToTopButton();
     initializeScrollProgress();
@@ -29,6 +29,56 @@ function loadSectionContent(sectionId) {
     return;
   }
 
+  // If the manifest contains a string (path to a markdown file), fetch it
+  if (typeof content === "string") {
+    const mdPath = content;
+    fetch(mdPath)
+      .then((res) => {
+        if (!res.ok)
+          throw new Error(`Failed to fetch ${mdPath}: ${res.status}`);
+        return res.text();
+      })
+      .then((md) => {
+        // Convert markdown to simple HTML and render
+        const html = markdownToHtml(md);
+
+        // Try to get a title from the first H1 in the markdown
+        const titleMatch = md.match(/^#\s+(.+)$/m);
+        const title = titleMatch
+          ? titleMatch[1].trim()
+          : navigationData.sections.find((s) => s.id === sectionId)?.title ||
+            "Documentation";
+
+        // Update breadcrumbs minimally
+        const breadcrumbsContainer = document.getElementById("breadcrumbs");
+        breadcrumbsContainer.innerHTML = `
+          <span class="breadcrumb-link">Documentation</span>
+          <span class="breadcrumb-separator">/</span>
+          <span>${escapeHtml(title)}</span>
+        `;
+
+        document.getElementById("articleTitle").textContent = title;
+        document.getElementById("articleDescription").textContent = "";
+
+        const articleContent = document.getElementById("articleContent");
+        articleContent.innerHTML = html;
+
+        // Build a simple TOC from h2/h3 headings inside the rendered HTML
+        buildTocFromContent();
+        addCopyButtons();
+        addContentRevealAnimation();
+      })
+      .catch((err) => {
+        console.error(err);
+        const articleContent = document.getElementById("articleContent");
+        articleContent.innerHTML = `<div class="load-error">Failed to load content: ${escapeHtml(
+          err.message
+        )}</div>`;
+      });
+
+    return;
+  }
+
   // Update breadcrumbs
   const breadcrumbsContainer = document.getElementById("breadcrumbs");
   breadcrumbsContainer.innerHTML = content.breadcrumbs
@@ -45,18 +95,28 @@ function loadSectionContent(sectionId) {
     })
     .join("");
 
-  // Update title and description
-  document.getElementById("articleTitle").textContent = content.title;
-  document.getElementById("articleDescription").textContent =
-    content.description;
+  // Update title and description (hide default header for hero layout)
+  const titleEl = document.getElementById("articleTitle");
+  const descEl = document.getElementById("articleDescription");
+  if (content.layout === "hero") {
+    titleEl.textContent = "";
+    descEl.textContent = "";
+  } else {
+    titleEl.textContent = content.title;
+    descEl.textContent = content.description;
+  }
 
   // Update main content
   const articleContent = document.getElementById("articleContent");
-  articleContent.innerHTML = content.sections
-    .map((section) => {
-      switch (section.type) {
-        case "info-box":
-          return `
+  const heroHtml =
+    content.layout === "hero" ? buildHero(content.hero || {}, content) : "";
+  articleContent.innerHTML =
+    heroHtml +
+    content.sections
+      .map((section) => {
+        switch (section.type) {
+          case "info-box":
+            return `
             <div class="info-box">
               <svg class="info-icon" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
@@ -68,8 +128,8 @@ function loadSectionContent(sectionId) {
               </div>
             </div>
           `;
-        case "warning-box":
-          return `
+          case "warning-box":
+            return `
             <div class="warning-box">
               <svg class="warning-icon" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2L2 20h20L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -81,31 +141,31 @@ function loadSectionContent(sectionId) {
               </div>
             </div>
           `;
-        case "heading":
-          const headingId = section.content
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, "");
-          return `<h${section.level} class="content-heading" id="${headingId}">${section.content}</h${section.level}>`;
-        case "text":
-          return `<div class="text-content"><p>${section.content}</p></div>`;
-        case "list":
-          return `
+          case "heading":
+            const headingId = section.content
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-|-$/g, "");
+            return `<h${section.level} class="content-heading" id="${headingId}">${section.content}</h${section.level}>`;
+          case "text":
+            return `<div class="text-content"><p>${section.content}</p></div>`;
+          case "list":
+            return `
             <ul class="content-list">
               ${section.items.map((item) => `<li>${item}</li>`).join("")}
             </ul>
           `;
-        case "image":
-          return `
+          case "image":
+            return `
             <div class="content-image">
               <img src="${section.src}" alt="${section.alt}" onerror="this.parentElement.innerHTML='<div style=\\'padding:100px;text-align:center;background:#f4f5f7;color:#6b778c;\\'>Image placeholder: ${section.alt}</div>'">
             </div>
           `;
-        default:
-          return "";
-      }
-    })
-    .join("");
+          default:
+            return "";
+        }
+      })
+      .join("");
 
   // Update table of contents
   const tocNav = document.getElementById("tocNav");
@@ -155,7 +215,91 @@ function loadSectionContent(sectionId) {
 
   // Scroll to top
   window.scrollTo({ top: 0, behavior: "smooth" });
-} // Initialize header navigation
+
+  // Enhance code blocks and animations
+  addCopyButtons();
+  addContentRevealAnimation();
+}
+
+// Build a Twilio-like hero for the Issue Changelog landing
+function buildHero(hero, fallback) {
+  const title = hero.title || (fallback && fallback.title) || "Issue Changelog";
+  const subtitle = hero.subtitle || (fallback && fallback.description) || "";
+  const ctas = Array.isArray(hero.ctas) ? hero.ctas : [];
+  const code = (hero.code && hero.code.snippet) || "// sample coming soon";
+  const lang = (hero.code && hero.code.language) || "js";
+  const image = hero.image && hero.image.src ? hero.image : null;
+
+  const ctaHtml = ctas
+    .map(
+      (c) =>
+        `<button class="hero-cta" data-target="${c.target}">${c.label} <span class="hero-cta-arrow">→</span></button>`
+    )
+    .join("");
+
+  const escaped = escapeHtml(code);
+
+  // Event binding happens after injection in loadSectionContent
+  setTimeout(() => {
+    document.querySelectorAll(".hero-cta").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-target");
+        if (target && sectionContents[target]) {
+          loadSectionContent(target);
+        }
+      });
+    });
+  }, 0);
+
+  const callouts = image && Array.isArray(image.callouts) ? image.callouts : [];
+  const calloutsHtml = callouts
+    .map(
+      (c) =>
+        `<div class="hero-callout" style="top: ${c.top}; left: ${c.left};">
+       <div class="hero-callout-inner">
+         <div class="hero-callout-number">${c.number}</div>
+       </div>
+     </div>`
+    )
+    .join("");
+
+  const rightCard = image
+    ? `
+          <div class="hero-image-card">
+            <div class="hero-code-header">YOUR APP</div>
+            ${calloutsHtml}
+            <img src="${image.src}" alt="${escapeHtml(
+        image.alt || "Hero image"
+      )}" onerror="this.parentElement.innerHTML='<div style=\'padding:80px;text-align:center;color:#6b778c;\'>Image placeholder: ${escapeHtml(
+        image.alt || "Hero image"
+      )}</div>'" />
+            <div class="hero-bubble">Ahoy, world!</div>
+          </div>
+        `
+    : `
+          <div class="hero-code-card">
+            <div class="hero-code-header">YOUR APP</div>
+            <pre class="hero-pre"><code class="language-${lang}">${escaped}</code></pre>
+            <a class="hero-examples" href="#">View complete examples</a>
+            <div class="hero-bubble">Ahoy, changelog!</div>
+          </div>
+        `;
+
+  return `
+      <section class="hero">
+        <div class="hero-left">
+          <h1 class="hero-title">${escapeHtml(title)}</h1>
+          <p class="hero-subtitle">${escapeHtml(subtitle)}</p>
+          <div class="hero-cta-group">${ctaHtml}</div>
+        </div>
+        <div class="hero-right">
+          ${rightCard}
+        </div>
+      </section>
+    `;
+}
+
+// Initialize header navigation
 function initializeHeader() {
   const headerNavElement = document.getElementById("headerNav");
 
@@ -168,41 +312,59 @@ function initializeHeader() {
 function initializeSidebar() {
   const sidebarNav = document.getElementById("sidebarNav");
 
-  sidebarNav.innerHTML = navigationData.sections
+  // Optional product card at the top (style similar to Twilio's product header)
+  let html = "";
+  const first = navigationData.sections && navigationData.sections[0];
+  if (first && first.id === "issue-changelog") {
+    html += `
+      <div class="sidebar-product-card" data-section-id="${first.id}">
+        <div class="sidebar-product-title">${first.title}</div>
+      </div>
+    `;
+  }
+
+  // Render remaining sections (skip the product card entry if present)
+  const sectionsToRender = navigationData.sections.filter(
+    (s, idx) => !(idx === 0 && s.id === "issue-changelog")
+  );
+
+  html += sectionsToRender
     .map(
       (section) => `
-        <div class="nav-section ${
-          section.expanded ? "expanded" : ""
-        }" data-section-id="${section.id}">
-            <div class="nav-section-title" data-section-id="${section.id}">
-                <svg class="nav-section-icon" viewBox="0 0 16 16" fill="none">
-                    <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span class="nav-section-text">${section.title}</span>
-            </div>
-            ${
-              section.items.length > 0
-                ? `
-                <div class="nav-items">
-                    ${section.items
-                      .map(
-                        (item) => `
-                        <a href="#${item.id}" class="nav-item ${
-                          item.active ? "active" : ""
-                        }" data-item-id="${item.id}">
-                            ${item.title}
-                        </a>
-                    `
-                      )
-                      .join("")}
-                </div>
-            `
-                : ""
-            }
+      <div class="nav-section ${
+        section.expanded ? "expanded" : ""
+      }" data-section-id="${section.id}">
+        <div class="nav-section-title" data-section-id="${section.id}">
+          <svg class="nav-section-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="nav-section-text">${section.title}</span>
         </div>
+        ${
+          section.items.length > 0
+            ? `
+          <div class="nav-items">
+            ${section.items
+              .map(
+                (item) => `
+              <a href="#${item.id}" class="nav-item ${
+                  item.active ? "active" : ""
+                }" data-item-id="${item.id}">
+                ${item.title}
+              </a>
+            `
+              )
+              .join("")}
+          </div>
+        `
+            : ""
+        }
+      </div>
     `
     )
     .join("");
+
+  sidebarNav.innerHTML = html;
 
   // Add click handlers for expandable sections
   document.querySelectorAll(".nav-section-title").forEach((title) => {
@@ -254,6 +416,22 @@ function initializeSidebar() {
       this.classList.add("active");
     });
   });
+
+  // Click handler for product card (loads its page)
+  const productCard = document.querySelector(".sidebar-product-card");
+  if (productCard) {
+    productCard.addEventListener("click", function () {
+      const id = this.getAttribute("data-section-id");
+      if (sectionContents[id]) {
+        loadSectionContent(id);
+        // Highlight like an active section
+        document
+          .querySelectorAll(".nav-section-title")
+          .forEach((t) => t.classList.remove("active-section"));
+        this.classList.add("active-section");
+      }
+    });
+  }
 }
 
 // Initialize sidebar toggle for mobile
@@ -733,6 +911,122 @@ function addContentRevealAnimation() {
     });
 }
 
+// Minimal markdown -> HTML converter (supports headings, paragraphs, unordered lists, and code blocks)
+function markdownToHtml(md) {
+  // Normalize line endings
+  const lines = md.replace(/\r\n/g, "\n").split("\n");
+  const out = [];
+  let inList = false;
+
+  function closeList() {
+    if (inList) {
+      out.push("</ul>");
+      inList = false;
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    if (!line.trim()) {
+      closeList();
+      continue;
+    }
+
+    // Heading levels
+    const hMatch = line.match(/^(#{1,6})\s+(.*)$/);
+    if (hMatch) {
+      closeList();
+      const level = Math.min(hMatch[1].length, 6);
+      const text = escapeHtml(hMatch[2].trim());
+      out.push(`<h${level}>${text}</h${level}>`);
+      continue;
+    }
+
+    // Unordered list
+    const liMatch = line.match(/^[-*+]\s+(.*)$/);
+    if (liMatch) {
+      if (!inList) {
+        inList = true;
+        out.push('<ul class="content-list">\n');
+      }
+      out.push(`<li>${escapeHtml(liMatch[1].trim())}</li>`);
+      continue;
+    }
+
+    // Code block (fenced)
+    const fencedStart = line.match(/^```(\w*)/);
+    if (fencedStart) {
+      const lang = fencedStart[1] || "";
+      let codeLines = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith("```")) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      closeList();
+      out.push(
+        `<pre><code class=\"language-${escapeHtml(lang)}\">${escapeHtml(
+          codeLines.join("\n")
+        )}</code></pre>`
+      );
+      continue;
+    }
+
+    // Paragraph (fallback)
+    closeList();
+    out.push(`<p>${escapeHtml(line.trim())}</p>`);
+  }
+
+  closeList();
+  return out.join("\n");
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Build a simple table-of-contents by scanning the rendered articleContent for headings
+function buildTocFromContent() {
+  const tocNav = document.getElementById("tocNav");
+  const articleContent = document.getElementById("articleContent");
+  const headings = articleContent.querySelectorAll("h2, h3");
+  if (!headings || headings.length === 0) {
+    tocNav.innerHTML = "";
+    return;
+  }
+
+  const tocItems = Array.from(headings).map((h, idx) => {
+    const id = `md-heading-${idx}`;
+    h.id = id;
+    return `<a href="#${id}" class="toc-link" data-anchor="#${id}">${escapeHtml(
+      h.textContent
+    )}</a>`;
+  });
+
+  tocNav.innerHTML = tocItems.join("\n");
+  // Attach click listeners similar to existing behavior
+  document.querySelectorAll(".toc-link").forEach((link) => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      const anchor = this.getAttribute("data-anchor");
+      const targetElement = document.querySelector(anchor);
+      if (targetElement) {
+        const headerHeight = 64;
+        const offset = 20;
+        const elementPosition = targetElement.getBoundingClientRect().top;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - headerHeight - offset;
+        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+      }
+    });
+  });
+}
+
 // Initialize version dropdown functionality
 function initializeVersionDropdown() {
   const versionBtn = document.getElementById("versionBtn");
@@ -791,7 +1085,216 @@ function showVersionNotification(version) {
   }, 3000);
 }
 
+// Initialize Save as PDF button
+function initializeSaveAsPdfButton() {
+  const btn = document.getElementById("savePdfBtn");
+  if (!btn) return;
+  // helper: render a section's 'sections' array into a container element
+  function renderSectionsToElement(sections) {
+    const container = document.createElement("div");
+    container.className = "pdf-section";
+    sections.forEach((section) => {
+      switch (section.type) {
+        case "heading": {
+          const h = document.createElement(`h${section.level || 2}`);
+          h.className = "content-heading";
+          h.textContent = section.content;
+          container.appendChild(h);
+          break;
+        }
+        case "text": {
+          const p = document.createElement("p");
+          p.className = "text-content";
+          p.innerHTML = section.content;
+          container.appendChild(p);
+          break;
+        }
+        case "list": {
+          const ul = document.createElement("ul");
+          ul.className = "content-list";
+          (section.items || []).forEach((it) => {
+            const li = document.createElement("li");
+            li.textContent = it;
+            ul.appendChild(li);
+          });
+          container.appendChild(ul);
+          break;
+        }
+        case "info-box": {
+          const box = document.createElement("div");
+          box.className = "info-box pdf-info-box";
+          box.innerHTML = `<h3>${
+            section.title || "Info"
+          }</h3><div class="info-content"><p>${section.content}</p></div>`;
+          container.appendChild(box);
+          break;
+        }
+        case "warning-box": {
+          const box = document.createElement("div");
+          box.className = "warning-box pdf-warning-box";
+          box.innerHTML = `<h3>${
+            section.title || "Warning"
+          }</h3><div class="warning-content"><p>${section.content}</p></div>`;
+          container.appendChild(box);
+          break;
+        }
+        case "image": {
+          const img = document.createElement("img");
+          img.src = section.src;
+          img.alt = section.alt || "";
+          img.style.maxWidth = "100%";
+          container.appendChild(img);
+          break;
+        }
+        default:
+          // unknown types: render raw
+          const raw = document.createElement("div");
+          raw.innerHTML = section.content || "";
+          container.appendChild(raw);
+      }
+    });
+    return container;
+  }
+
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    // show notification
+    const notification = document.createElement("div");
+    notification.className = "version-notification";
+    notification.innerHTML = `
+      <div class="version-notification-content">
+        <span class="notification-icon">📄</span>
+        <span>Preparing PDF (this may take a moment)...</span>
+      </div>
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add("show"), 50);
+
+    // build full document container
+    const full = document.createElement("div");
+    full.className = "pdf-full-document";
+
+    // Add header for PDF: title, version, date
+    const titleEl = document.getElementById("articleTitle");
+    const versionActive = document.querySelector(".dropdown-item.active");
+    const versionStr = versionActive
+      ? versionActive.getAttribute("data-version")
+      : "latest";
+    const header = document.createElement("div");
+    header.className = "pdf-header";
+    const h1 = document.createElement("h1");
+    h1.textContent = titleEl ? titleEl.textContent.trim() : "Documentation";
+    const meta = document.createElement("div");
+    meta.className = "pdf-meta";
+    const date = new Date().toLocaleDateString();
+    meta.textContent = `Version ${versionStr} • ${date}`;
+    header.appendChild(h1);
+    header.appendChild(meta);
+    full.appendChild(header);
+
+    // Iterate through navigationData to include all sections in order
+    (navigationData.sections || []).forEach((nav) => {
+      const id = nav.id;
+      const page = sectionContents[id];
+      if (!page) return;
+      // section title
+      const sectionWrap = document.createElement("section");
+      sectionWrap.className = "pdf-page";
+      const secTitle = document.createElement("h2");
+      secTitle.textContent = page.title || nav.title;
+      sectionWrap.appendChild(secTitle);
+
+      // render page sections
+      const rendered = renderSectionsToElement(page.sections || []);
+      sectionWrap.appendChild(rendered);
+
+      // optional page break
+      const pb = document.createElement("div");
+      pb.className = "page-break";
+      sectionWrap.appendChild(pb);
+
+      full.appendChild(sectionWrap);
+    });
+
+    // build filename
+    const safeTitle = (titleEl ? titleEl.textContent : "documentation")
+      .toLowerCase()
+      .replace(/[^a-z0-9\-\s]+/g, "")
+      .replace(/\s+/g, "-");
+    const filename = `${safeTitle}-${versionStr}-full.pdf`;
+
+    // Inject print-friendly CSS into wrapper
+    const style = document.createElement("style");
+    style.textContent = `
+      .pdf-full-document { font-family: Arial, Helvetica, sans-serif; color: #111; background: #fff; padding: 20px; }
+      .pdf-header h1 { margin: 0 0 6px 0; font-size: 20px; color: #0b3a66; }
+      .pdf-meta { font-size: 12px; color: #333; margin-bottom: 12px; }
+      h2 { color: #0b3a66; margin-top: 18px; }
+      p { color: #111; line-height: 1.5; }
+      .info-box, .pdf-info-box { border: 1px solid #cce4ff; background: #e9f5ff; padding: 10px; border-radius: 4px; }
+      .warning-box, .pdf-warning-box { border: 1px solid #ffd6a5; background: #fff4e6; padding: 10px; border-radius: 4px; }
+      .content-list { margin-left: 18px; }
+      .page-break { page-break-after: always; }
+      img { max-width: 100%; height: auto; }
+    `;
+
+    // append wrapper hidden and generate PDF
+    const wrapper = document.createElement("div");
+    wrapper.style.position = "fixed";
+    wrapper.style.left = "-9999px";
+    wrapper.appendChild(style);
+    wrapper.appendChild(full);
+    document.body.appendChild(wrapper);
+
+    if (window.html2pdf) {
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] },
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(full)
+        .save()
+        .then(() => {
+          wrapper.remove();
+          setTimeout(() => {
+            notification.classList.remove("show");
+            setTimeout(() => notification.remove(), 300);
+          }, 800);
+        })
+        .catch((err) => {
+          console.error("PDF generation failed", err);
+          wrapper.remove();
+          setTimeout(() => {
+            notification.classList.remove("show");
+            setTimeout(() => notification.remove(), 300);
+          }, 800);
+        });
+    } else {
+      // fallback: cleanup and show message
+      console.warn("html2pdf not available, falling back to print dialog");
+      wrapper.remove();
+      setTimeout(() => {
+        notification.classList.remove("show");
+        setTimeout(() => notification.remove(), 300);
+      }, 800);
+      try {
+        window.print();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  });
+}
+
 // Initialize version dropdown when page loads
 document.addEventListener("DOMContentLoaded", function () {
   initializeVersionDropdown();
+  initializeSaveAsPdfButton();
 });
