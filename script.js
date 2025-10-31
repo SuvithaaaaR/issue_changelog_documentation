@@ -95,10 +95,15 @@ function loadSectionContent(sectionId) {
     })
     .join("");
 
-  // Update title and description (hide default header for hero layout)
+  // Update title and description (hide default header for hero layout or objectives-banner)
   const titleEl = document.getElementById("articleTitle");
   const descEl = document.getElementById("articleDescription");
-  if (content.layout === "hero") {
+  const hasObjectivesBanner =
+    content.sections &&
+    content.sections[0] &&
+    content.sections[0].type === "objectives-banner" &&
+    content.sections[0].pageTitle;
+  if (content.layout === "hero" || hasObjectivesBanner) {
     titleEl.textContent = "";
     descEl.textContent = "";
   } else {
@@ -123,8 +128,8 @@ function loadSectionContent(sectionId) {
                 <path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
               <div class="info-content">
-                <h3>${section.title}</h3>
-                <p>${section.content}</p>
+                <h3>${parseMarkdown(section.title)}</h3>
+                <p>${parseMarkdown(section.content)}</p>
               </div>
             </div>
           `;
@@ -136,8 +141,8 @@ function loadSectionContent(sectionId) {
                 <path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
               <div class="warning-content">
-                <h3>${section.title}</h3>
-                <p>${section.content}</p>
+                <h3>${parseMarkdown(section.title)}</h3>
+                <p>${parseMarkdown(section.content)}</p>
               </div>
             </div>
           `;
@@ -146,19 +151,99 @@ function loadSectionContent(sectionId) {
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, "-")
               .replace(/^-|-$/g, "");
-            return `<h${section.level} class="content-heading" id="${headingId}">${section.content}</h${section.level}>`;
+            return `<h${
+              section.level
+            } class="content-heading" id="${headingId}">${parseMarkdown(
+              section.content
+            )}</h${section.level}>`;
           case "text":
-            return `<div class="text-content"><p>${section.content}</p></div>`;
-          case "list":
+            return `<div class="text-content"><p>${parseMarkdown(
+              section.content
+            )}</p></div>`;
+          case "objectives-banner":
             return `
-            <ul class="content-list">
-              ${section.items.map((item) => `<li>${item}</li>`).join("")}
+            <div class="objectives-banner">
+              ${
+                section.pageTitle
+                  ? `
+              <div class="objectives-banner-header">
+                <h1>${parseMarkdown(section.pageTitle)}</h1>
+                <div class="objectives-banner-badges">
+                  ${
+                    section.duration
+                      ? `<span class="objectives-badge">${section.duration}</span>`
+                      : ""
+                  }
+                  ${
+                    section.level
+                      ? `<span class="objectives-badge">${section.level}</span>`
+                      : ""
+                  }
+                </div>
+              </div>
+              `
+                  : ""
+              }
+              ${
+                section.subtitle
+                  ? `<p class="objectives-banner-subtitle">${parseMarkdown(
+                      section.subtitle
+                    )}</p>`
+                  : ""
+              }
+              <h3>${parseMarkdown(section.title)}</h3>
+              <ul>
+                ${section.items
+                  .map((item) => `<li>${parseMarkdown(item)}</li>`)
+                  .join("")}
+              </ul>
+            </div>
+          `;
+          case "list":
+            const listClass = section.className
+              ? `content-list ${section.className}`
+              : "content-list";
+            return `
+            <ul class="${listClass}">
+              ${section.items
+                .map((item) => `<li>${parseMarkdown(item)}</li>`)
+                .join("")}
             </ul>
           `;
           case "image":
             return `
             <div class="content-image">
               <img src="${section.src}" alt="${section.alt}" onerror="this.parentElement.innerHTML='<div style=\\'padding:100px;text-align:center;background:#f4f5f7;color:#6b778c;\\'>Image placeholder: ${section.alt}</div>'">
+            </div>
+          `;
+          case "annotated-image":
+            return `
+            <div class="annotated-image-container">
+              <img src="${section.src}" alt="${section.alt}">
+              ${
+                section.annotations && Array.isArray(section.annotations)
+                  ? section.annotations
+                      .map(
+                        (annotation) => `
+                ${
+                  annotation.lineFrom && annotation.lineTo
+                    ? `<div class="annotation-line" style="left: ${
+                        annotation.lineFrom.x
+                      }%; top: ${annotation.lineFrom.y}%; height: ${Math.abs(
+                        annotation.lineTo.y - annotation.lineFrom.y
+                      )}%;"></div>`
+                    : ""
+                }
+                <div class="annotation-tag" style="left: ${
+                  annotation.x
+                }%; top: ${annotation.y}%; transform: translate(-50%, -50%);">${
+                          annotation.number
+                        }</div>
+              `
+                      )
+                      .join("")
+                  : ""
+              }
             </div>
           `;
           default:
@@ -255,10 +340,17 @@ function buildHero(hero, fallback) {
   const calloutsHtml = callouts
     .map(
       (c) =>
-        `<div class="hero-callout" style="top: ${c.top}; left: ${c.left};">
+        `<div class="hero-callout" style="top: ${c.top}; left: ${c.left};" ${
+          c.tooltip ? `data-tooltip="${escapeHtml(c.tooltip)}"` : ""
+        }>
        <div class="hero-callout-inner">
          <div class="hero-callout-number">${c.number}</div>
        </div>
+       ${
+         c.tooltip
+           ? `<div class="hero-callout-tooltip">${escapeHtml(c.tooltip)}</div>`
+           : ""
+       }
      </div>`
     )
     .join("");
@@ -266,14 +358,12 @@ function buildHero(hero, fallback) {
   const rightCard = image
     ? `
           <div class="hero-image-card">
-            <div class="hero-code-header">YOUR APP</div>
             ${calloutsHtml}
             <img src="${image.src}" alt="${escapeHtml(
         image.alt || "Hero image"
       )}" onerror="this.parentElement.innerHTML='<div style=\'padding:80px;text-align:center;color:#6b778c;\'>Image placeholder: ${escapeHtml(
         image.alt || "Hero image"
       )}</div>'" />
-            <div class="hero-bubble">Ahoy, world!</div>
           </div>
         `
     : `
@@ -440,7 +530,16 @@ function initializeSidebarToggle() {
   const sidebar = document.querySelector(".sidebar");
 
   sidebarToggle.addEventListener("click", function () {
+    // Toggle sidebar for both mobile and desktop
     sidebar.classList.toggle("open");
+    document.body.classList.toggle("sidebar-collapsed");
+
+    // Update button aria-label
+    const isCollapsed = document.body.classList.contains("sidebar-collapsed");
+    sidebarToggle.setAttribute(
+      "aria-label",
+      isCollapsed ? "Expand sidebar" : "Collapse sidebar"
+    );
   });
 
   // Close sidebar when clicking outside on mobile
@@ -448,6 +547,7 @@ function initializeSidebarToggle() {
     if (window.innerWidth <= 768) {
       if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
         sidebar.classList.remove("open");
+        document.body.classList.remove("sidebar-collapsed");
       }
     }
   });
@@ -990,6 +1090,14 @@ function escapeHtml(str) {
     .replace(/'/g, "&#39;");
 }
 
+// Parse simple markdown bold syntax (**text** -> <strong>text</strong>)
+function parseMarkdown(str) {
+  // First escape HTML
+  let escaped = escapeHtml(str);
+  // Then convert **text** to <strong>text</strong>
+  return escaped.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+
 // Build a simple table-of-contents by scanning the rendered articleContent for headings
 function buildTocFromContent() {
   const tocNav = document.getElementById("tocNav");
@@ -1144,6 +1252,48 @@ function initializeSaveAsPdfButton() {
           img.alt = section.alt || "";
           img.style.maxWidth = "100%";
           container.appendChild(img);
+          break;
+        }
+        case "annotated-image": {
+          const annotatedContainer = document.createElement("div");
+          annotatedContainer.className = "annotated-image-container";
+
+          const img = document.createElement("img");
+          img.src = section.src;
+          img.alt = section.alt || "";
+          annotatedContainer.appendChild(img);
+
+          // Add annotations if provided
+          if (section.annotations && Array.isArray(section.annotations)) {
+            section.annotations.forEach((annotation) => {
+              // Create line if coordinates provided
+              if (annotation.lineFrom && annotation.lineTo) {
+                const line = document.createElement("div");
+                line.className = "annotation-line";
+
+                // Calculate vertical line length (simplified for vertical lines)
+                const lineLength = Math.abs(
+                  annotation.lineTo.y - annotation.lineFrom.y
+                );
+
+                line.style.left = annotation.lineFrom.x + "%";
+                line.style.top = annotation.lineFrom.y + "%";
+                line.style.height = lineLength + "%";
+                annotatedContainer.appendChild(line);
+              }
+
+              // Create tag
+              const tag = document.createElement("div");
+              tag.className = "annotation-tag";
+              tag.textContent = annotation.number;
+              tag.style.left = annotation.x + "%";
+              tag.style.top = annotation.y + "%";
+              tag.style.transform = "translate(-50%, -50%)";
+              annotatedContainer.appendChild(tag);
+            });
+          }
+
+          container.appendChild(annotatedContainer);
           break;
         }
         default:

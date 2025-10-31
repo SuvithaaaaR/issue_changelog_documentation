@@ -24,18 +24,18 @@
     "Liberation Sans", sans-serif;
   --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
-  --font-size-body: 14px; /* ADS product body */
+  --font-size-body: 16px; /* Increased from 14px */
   --line-height-body: 1.6;
-  --h1-size: 28px; /* Heading XL */
+  --h1-size: 32px; /* Increased from 28px */
   --h1-line: 1.25;
   --h1-weight: 700;
-  --h2-size: 24px; /* Heading L */
+  --h2-size: 28px; /* Increased from 24px */
   --h2-line: 1.3;
   --h2-weight: 700;
-  --h3-size: 20px; /* Heading M */
+  --h3-size: 22px; /* Increased from 20px */
   --h3-line: 1.4;
   --h3-weight: 600;
-  --h4-size: 18px; /* Heading S */
+  --h4-size: 20px; /* Increased from 18px */
   --h4-line: 1.4;
   --h4-weight: 600;
 
@@ -511,6 +511,20 @@ a:active {
   overflow-y: auto;
   padding: 24px 0;
   z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+/* Sidebar collapsed state */
+body.sidebar-collapsed .sidebar {
+  transform: translateX(-100%);
+}
+
+body.sidebar-collapsed .content {
+  margin-left: 0;
+}
+
+body.sidebar-collapsed .toc {
+  right: 20px;
 }
 
 .sidebar-nav {
@@ -679,19 +693,35 @@ a:active {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: fixed;
   width: 32px;
   height: 32px;
+  top: 84px;
+  left: 260px; /* Positioned at the edge of sidebar (240px width + 20px margin) */
+  background-color: #ffffff;
   border: none;
-  background: none;
-  color: var(--text-medium);
+  border-radius: 3px;
+  box-shadow: rgba(9, 30, 66, 0.31) 0px 0px 1px 0px,
+    rgba(9, 30, 66, 0.25) 0px 1px 1px 0px;
+  color: var(--ds-icon, #44546f);
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
+  padding: 0;
+  z-index: 100;
+  transition: left 0.3s ease, background-color 0.2s ease;
 }
 
 .sidebar-toggle:hover {
-  background-color: var(--bg-light);
-  color: var(--text-dark);
+  background-color: #f1f2f4;
+}
+
+/* When sidebar is collapsed */
+body.sidebar-collapsed .sidebar-toggle {
+  left: 20px; /* Move to left when sidebar is hidden */
+}
+
+/* Rotate icon when sidebar is collapsed */
+body.sidebar-collapsed .sidebar-toggle svg {
+  transform: rotate(180deg);
 }
 
 .breadcrumbs {
@@ -756,7 +786,7 @@ a:active {
 /* Hero (Twilio-like) */
 .hero {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr 1.3fr; /* Give more space to image column */
   gap: 48px;
   align-items: center;
   padding: 12px 0 24px 0;
@@ -815,18 +845,17 @@ a:active {
 
 .hero-image-card {
   position: relative;
-  background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 8px 8px 24px 8px;
-  box-shadow: var(--elevation-200);
+  overflow: visible; /* Allow image to extend beyond container */
+  /* Frame removed for cleaner, larger display */
 }
 
 .hero-image-card img {
-  width: 100%;
+  width: 100%; /* Full width of container */
+  max-width: none; /* Remove max-width constraint */
   height: auto;
   display: block;
-  border-radius: 8px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* Twilio-style numbered callout badges */
@@ -838,16 +867,16 @@ a:active {
 
 .hero-callout-inner {
   position: relative;
-  width: 3rem;
-  height: 3rem;
+  width: 2.25rem; /* Reduced from 3rem */
+  height: 2.25rem; /* Reduced from 3rem */
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    rgba(255, 100, 130, 0.9) 0%,
-    rgba(255, 70, 90, 0.95) 100%
+    rgba(59, 130, 246, 0.9) 0%,
+    rgba(37, 99, 235, 0.95) 100%
   );
-  box-shadow: 0 4px 14px rgba(255, 70, 90, 0.35),
-    0 0 0 4px rgba(255, 100, 130, 0.15), 0 0 0 8px rgba(255, 100, 130, 0.08);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35),
+    0 0 0 3px rgba(59, 130, 246, 0.15), 0 0 0 6px rgba(59, 130, 246, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -856,7 +885,7 @@ a:active {
 
 .hero-callout-number {
   color: white;
-  font-size: 1.125rem;
+  font-size: 0.95rem; /* Reduced from 1.125rem */
   font-weight: 700;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -865,13 +894,53 @@ a:active {
 @keyframes pulse-callout {
   0%,
   100% {
-    box-shadow: 0 4px 14px rgba(255, 70, 90, 0.35),
-      0 0 0 4px rgba(255, 100, 130, 0.15), 0 0 0 8px rgba(255, 100, 130, 0.08);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35),
+      0 0 0 4px rgba(59, 130, 246, 0.15), 0 0 0 8px rgba(59, 130, 246, 0.08);
   }
   50% {
-    box-shadow: 0 4px 18px rgba(255, 70, 90, 0.45),
-      0 0 0 6px rgba(255, 100, 130, 0.2), 0 0 0 12px rgba(255, 100, 130, 0.12);
+    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.45),
+      0 0 0 6px rgba(59, 130, 246, 0.2), 0 0 0 12px rgba(59, 130, 246, 0.12);
   }
+}
+
+/* Callout tooltip */
+.hero-callout-tooltip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
+  background: rgba(23, 43, 77, 0.95);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: normal;
+  max-width: 280px;
+  min-width: 200px;
+  text-align: left;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  z-index: 10000; /* High z-index to appear above TOC and other elements */
+  pointer-events: none;
+}
+
+.hero-callout-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: rgba(23, 43, 77, 0.95);
+}
+
+.hero-callout:hover .hero-callout-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(-4px);
 }
 
 .hero-code-header {
@@ -913,6 +982,85 @@ a:active {
   .hero {
     grid-template-columns: 1fr;
   }
+}
+
+/* Learning Objectives Banner */
+.objectives-banner {
+  background: linear-gradient(135deg, #fff4e0 0%, #ffeac2 100%);
+  border-radius: var(--radius-200);
+  padding: var(--space-500);
+  margin: var(--space-500) 0;
+  box-shadow: var(--elevation-100);
+}
+
+.objectives-banner-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-300);
+  margin-bottom: var(--space-400);
+}
+
+.objectives-banner-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #172b4d;
+  margin: 0;
+}
+
+.objectives-banner-subtitle {
+  font-size: 16px;
+  color: #5e6c84;
+  line-height: 1.6;
+  margin-top: var(--space-200);
+  margin-bottom: 0;
+  padding-bottom: var(--space-400);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.objectives-banner-badges {
+  display: flex;
+  gap: var(--space-200);
+}
+
+.objectives-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: white;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0052cc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.objectives-banner h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #172b4d;
+  margin-bottom: var(--space-300);
+}
+
+.objectives-banner ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.objectives-banner ul li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: var(--space-200);
+  color: #172b4d;
+  line-height: 1.6;
+}
+
+.objectives-banner ul li::before {
+  content: "•";
+  position: absolute;
+  left: 8px;
+  color: #0052cc;
+  font-weight: bold;
 }
 
 /* Info Box */
@@ -993,30 +1141,11 @@ h2.content-heading {
   line-height: var(--h2-line);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
-  padding-left: 12px;
-}
-
-h2.content-heading::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 4px;
-  background: linear-gradient(to bottom, var(--primary-color), transparent);
-  border-radius: 2px;
 }
 
 h3.content-heading {
   font-size: var(--h3-size);
   line-height: var(--h3-line);
-  padding-left: 8px;
-  border-left: 3px solid var(--border-color);
-  transition: border-color 0.2s;
-}
-
-h3.content-heading:hover {
-  border-left-color: var(--primary-color);
 }
 
 h4.content-heading {
@@ -1047,6 +1176,30 @@ h4.content-heading {
 .content-list li::marker {
   color: var(--primary-color);
   font-weight: bold;
+}
+
+/* Checkmark icon for "What You Can See" section lists only */
+.content-list.checkmark-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+.content-list.checkmark-list li {
+  padding-left: 32px;
+}
+
+.content-list.checkmark-list li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: var(--ds-icon-accent-green, #22a06b);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 32px;
+}
+
+.content-list.checkmark-list li::marker {
+  display: none;
 }
 
 /* Warning Box */
@@ -1356,4 +1509,53 @@ pre code {
 
 .notification-icon {
   font-size: 20px;
+}
+
+/* Annotated image with numbered tags */
+.annotated-image-container {
+  position: relative;
+  margin: 2rem 0;
+  display: inline-block;
+  width: 100%;
+}
+
+.annotated-image-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25),
+    0px 0px 1px rgba(9, 30, 66, 0.31);
+}
+
+.annotation-tag {
+  position: absolute;
+  height: 40px;
+  width: 40px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #f5cd47;
+  font-family: "Charlie Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  color: #172b4d;
+  box-shadow: 0px 8px 12px rgba(9, 30, 66, 0.15),
+    0px 0px 1px rgba(9, 30, 66, 0.31);
+  border: 2px solid #ffffff;
+  z-index: 10;
+  cursor: default;
+}
+
+.annotation-line {
+  position: absolute;
+  width: 2px;
+  background-color: #f5cd47;
+  z-index: 5;
+  transform-origin: top;
 }

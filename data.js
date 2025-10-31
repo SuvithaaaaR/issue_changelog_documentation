@@ -120,9 +120,27 @@ const sectionContents = {
         src: "home img.png",
         alt: "Issue Change Log panel screenshot",
         callouts: [
-          { number: 1, top: "-1.5rem", left: "70%" },
-          { number: 2, top: "15%", left: "-1.5rem" },
-          { number: 3, top: "70%", left: "80%" },
+          {
+            number: 1,
+            top: "8%",
+            left: "92%",
+            tooltip:
+              "Export your changelog data to CSV format for external analysis and reporting",
+          },
+          {
+            number: 2,
+            top: "27%",
+            left: "-1.2rem",
+            tooltip:
+              "Filter changelog entries by field, content, author, and status to find specific changes",
+          },
+          {
+            number: 3,
+            top: "89%",
+            left: "23%",
+            tooltip:
+              "Control the number of items displayed per page for better navigation",
+          },
         ],
       },
       code: {
@@ -157,35 +175,29 @@ console.log('Ahoy, changelog!', histories.length);
       {
         type: "text",
         content:
-          "Issue Change Log surfaces a chronological, detailed history of changes on Jira issues — including field updates, comment edits, attachments, and status transitions — all respecting Jira permissions.",
+          "Issue Change Log surfaces a **chronological, detailed history** of all activity within Jira issues — including **field updates**, **comment edits**, **attachments**, and **status transitions** — while fully respecting **Jira permissions** and **visibility rules**.",
+      },
+      {
+        type: "text",
+        content:
+          "This app is designed to help teams **analyze issue activity**, **audit changes**, and share **transparent progress reports** with minimal effort.",
       },
       { type: "heading", level: 2, content: "What You Can See" },
       {
         type: "list",
+        className: "checkmark-list",
         items: [
-          "Field modifications (system and custom) with before/after values",
-          "Comment additions and edits with authors and timestamps",
-          "Attachment add/remove events with filename, size, and MIME type",
-          "Status transitions with actor and time",
-          "Time-based filters and CSV export for analysis",
-        ],
-      },
-      { type: "heading", level: 2, content: "Quick Links" },
-      {
-        type: "list",
-        items: [
-          "Get Started — overview and first steps",
-          "Features and Capabilities — deep dive into functionality",
-          "Installation Guide — install from Atlassian Marketplace",
-          "Configuration and Setup — site and project controls",
-          "User Guide — everyday workflows and exports",
+          "**Field modifications** (system and custom) with **before/after values**",
+          "**Comment additions and edits** with authors and timestamps",
+          "**Attachment add/remove events** with filename, size, and MIME type",
+          "**Status transitions** with actor and time",
+          "**Time-based filters** and **CSV export** for analysis",
         ],
       },
     ],
     tableOfContents: [
       { title: "Overview", anchor: "#overview" },
       { title: "What You Can See", anchor: "#what-you-can-see" },
-      { title: "Quick Links", anchor: "#quick-links" },
     ],
   },
   "app-overview": {
@@ -197,7 +209,20 @@ console.log('Ahoy, changelog!', histories.length);
     description:
       "Start here to understand what Issue Change Log is, its benefits, who it's for, and how to install and use it in Jira Cloud.",
     sections: [
-      { type: "heading", level: 2, content: "Issue Change Log - App Overview" },
+      {
+        type: "objectives-banner",
+        pageTitle: "Get Started",
+        subtitle:
+          "Start here to understand what Issue Change Log is, its benefits, who it's for, and how to install and use it in Jira Cloud.",
+        title: "By the end of this guide, you'll be able to:",
+        items: [
+          "Understand what Issue Change Log is and its key benefits",
+          "Identify who can benefit from using this application",
+          "Install and configure the app from the Atlassian Marketplace",
+          "Navigate the core features and capabilities",
+          "Track and export issue change history effectively",
+        ],
+      },
       { type: "heading", level: 2, content: "Introduction" },
       {
         type: "text",
@@ -219,6 +244,76 @@ console.log('Ahoy, changelog!', histories.length);
           "Status transitions",
           "Custom field changes",
           "Time-based filtering of changes",
+        ],
+      },
+      {
+        type: "annotated-image",
+        src: "home img.png",
+        alt: "Issue Change Log interface showing changelog table with filters, author columns, field content, date information, and export options",
+        annotations: [
+          {
+            number: "1",
+            x: 25,
+            y: -5,
+            lineFrom: { x: 25, y: -8 },
+            lineTo: { x: 25, y: 3 },
+          },
+          {
+            number: "2",
+            x: 94,
+            y: -5,
+            lineFrom: { x: 94, y: -5 },
+            lineTo: { x: 94, y: 3 },
+          },
+          {
+            number: "3",
+            x: 8,
+            y: 100,
+            lineFrom: { x: 8, y: 40 },
+            lineTo: { x: 8, y: 58 },
+          },
+          {
+            number: "4",
+            x: 25,
+            y: 58,
+            lineFrom: { x: 25, y: 40 },
+            lineTo: { x: 25, y: 58 },
+          },
+          {
+            number: "5",
+            x: 42,
+            y: 58,
+            lineFrom: { x: 42, y: 40 },
+            lineTo: { x: 42, y: 58 },
+          },
+          {
+            number: "6",
+            x: 59,
+            y: 58,
+            lineFrom: { x: 59, y: 40 },
+            lineTo: { x: 59, y: 58 },
+          },
+          {
+            number: "7",
+            x: 76,
+            y: 58,
+            lineFrom: { x: 76, y: 40 },
+            lineTo: { x: 76, y: 58 },
+          },
+          {
+            number: "8",
+            x: 20,
+            y: 108,
+            lineFrom: { x: 20, y: 88 },
+            lineTo: { x: 20, y: 108 },
+          },
+          {
+            number: "9",
+            x: 80,
+            y: 108,
+            lineFrom: { x: 80, y: 88 },
+            lineTo: { x: 80, y: 108 },
+          },
         ],
       },
       { type: "heading", level: 2, content: "Key Benefits" },
