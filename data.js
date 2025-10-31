@@ -257,6 +257,9 @@ console.log('Ahoy, changelog!', histories.length);
             y: -5,
             lineFrom: { x: 25, y: -8 },
             lineTo: { x: 25, y: 3 },
+            tooltipTitle: "Refresh",
+            tooltipDescription:
+              "Reload the change log to see the latest updates from Jira.",
           },
           {
             number: "2",
@@ -264,161 +267,207 @@ console.log('Ahoy, changelog!', histories.length);
             y: -5,
             lineFrom: { x: 94, y: -5 },
             lineTo: { x: 94, y: 3 },
+            tooltipTitle: "Export to CSV",
+            tooltipDescription:
+              "Download complete changelog data in CSV format for external analysis.",
           },
           {
             number: "3",
             x: 8,
-            y: 100,
-            lineFrom: { x: 8, y: 40 },
-            lineTo: { x: 8, y: 58 },
+            y: 40,
+            lineFrom: { x: 8, y: 27 },
+            lineTo: { x: 8, y: 40 },
+            tooltipTitle: "Author Column",
+            tooltipDescription:
+              "Filter changes by the user who made them. Select one or more authors.",
           },
           {
             number: "4",
             x: 25,
-            y: 58,
-            lineFrom: { x: 25, y: 40 },
-            lineTo: { x: 25, y: 58 },
+            y: 40,
+            lineFrom: { x: 25, y: 27 },
+            lineTo: { x: 25, y: 40 },
+            tooltipTitle: "Field column",
+            tooltipDescription:
+              "Filter by which field was changed (status, assignee, etc.) or activity type.",
           },
           {
             number: "5",
             x: 42,
-            y: 58,
-            lineFrom: { x: 42, y: 40 },
-            lineTo: { x: 42, y: 58 },
+            y: 40,
+            lineFrom: { x: 42, y: 27 },
+            lineTo: { x: 42, y: 40 },
+            tooltipTitle: "From Column",
+            tooltipDescription:
+              "Search for changes by the previous/old value before the change was made.",
           },
           {
             number: "6",
-            x: 59,
-            y: 58,
-            lineFrom: { x: 59, y: 40 },
-            lineTo: { x: 59, y: 58 },
+            x: 65,
+            y: 40,
+            lineFrom: { x: 65, y: 27 },
+            lineTo: { x: 65, y: 40 },
+            tooltipTitle: "To Column",
+            tooltipDescription:
+              "Search for changes by the new/updated value after the change was made",
           },
           {
             number: "7",
-            x: 76,
-            y: 58,
-            lineFrom: { x: 76, y: 40 },
-            lineTo: { x: 76, y: 58 },
+            x: 89,
+            y: 40,
+            lineFrom: { x: 89, y: 27 },
+            lineTo: { x: 89, y: 40 },
+            tooltipTitle: "Date column",
+            tooltipDescription:
+              "Show changes from a specific time period. Filters all other results.",
           },
           {
             number: "8",
             x: 20,
-            y: 108,
-            lineFrom: { x: 20, y: 88 },
-            lineTo: { x: 20, y: 108 },
+            y: 104,
+            lineFrom: { x: 20, y: 97 },
+            lineTo: { x: 20, y: 105 },
+            tooltipTitle: "Items Per Page Selector",
+            tooltipDescription:
+              "Choose how many changes to display on each page (default: 25)",
           },
           {
             number: "9",
-            x: 80,
-            y: 108,
-            lineFrom: { x: 80, y: 88 },
-            lineTo: { x: 80, y: 108 },
+            x: 89,
+            y: 104,
+            lineFrom: { x: 89, y: 95.6 },
+            lineTo: { x: 50, y: 105 },
+            tooltipTitle: "Pagination Controls",
+            tooltipDescription:
+              "Navigate to previous/next page or view current page number.",
           },
         ],
       },
       { type: "heading", level: 2, content: "Key Benefits" },
-      { type: "heading", level: 3, content: "Complete Visibility" },
       {
-        type: "text",
+        type: "benefit-card",
+        icon: "visibility",
+        title: "Complete Visibility",
         content:
-          "Track every change made to Jira issues with detailed timestamps, authors, and modification details.",
+          "Track **every change** made to Jira issues with **detailed timestamps**, **authors**, and **modification details**. Never miss a single update to your issues.",
       },
-      { type: "heading", level: 3, content: "Enterprise-Grade Access Control" },
       {
-        type: "list",
-        items: [
-          "Site-level authorization managed by Jira administrators",
-          "Project-level enablement controlled by project administrators",
-          "Granular permission system ensures access only for authorized users",
+        type: "benefit-card",
+        icon: "security",
+        title: "Enterprise-Grade Access Control",
+        highlights: [
+          "**Site-level authorization** managed by Jira administrators",
+          "**Project-level enablement** controlled by project administrators",
+          "**Granular permission system** ensures access only for authorized users",
         ],
       },
-      { type: "heading", level: 3, content: "Enhanced Reporting" },
       {
-        type: "list",
-        items: [
-          "Export change logs to CSV format",
-          "Filter by time periods such as 24 hours, 7 days, 30 days, 6 months, 1 year, or all time",
-          "Track multiple issues simultaneously",
+        type: "benefit-card",
+        icon: "report",
+        title: "Enhanced Reporting",
+        highlights: [
+          "**Export change logs** to CSV format for external analysis",
+          "**Flexible time filters**: 24h, 7d, 30d, 6m, 1y, or all time",
+          "**Track multiple issues** simultaneously across projects",
         ],
       },
-      { type: "heading", level: 3, content: "Seamless Integration" },
       {
-        type: "list",
-        items: [
-          "Native Jira issue panel integration",
-          "Admin settings page for site-wide management",
-          "Project settings page for project-level control",
-          "Works with Jira Cloud without additional infrastructure",
+        type: "benefit-card",
+        icon: "integration",
+        title: "Seamless Integration",
+        highlights: [
+          "**Native Jira integration** directly in issue panels",
+          "**Admin settings page** for site-wide management",
+          "**Project settings** for project-level control",
+          "**Zero infrastructure** - works seamlessly with Jira Cloud",
         ],
       },
-      { type: "heading", level: 3, content: "Performance Optimized" },
       {
-        type: "list",
-        items: [
-          "Efficient data fetching with pagination",
-          "Optimized API calls to Jira REST API",
-          "Fast loading times even with large change histories",
+        type: "benefit-card",
+        icon: "performance",
+        title: "Performance Optimized",
+        highlights: [
+          "**Efficient pagination** for smooth data browsing",
+          "**Optimized API calls** to Jira REST API",
+          "**Fast loading** even with large change histories",
         ],
       },
-      { type: "heading", level: 2, content: "Target Audience" },
-      { type: "heading", level: 3, content: "Development Teams" },
+      { type: "heading", level: 2, content: "Target Audience & Use Cases" },
       {
         type: "text",
         content:
-          "Track code-related changes, bug fixes, and feature implementations through issue history.",
+          "If you use the same scheme for multiple projects, any change to that scheme will impact all associated projects. It's important to consider the benefits and scenarios for each use case.",
       },
-      { type: "heading", level: 3, content: "Project Managers" },
       {
         type: "text",
         content:
-          "Monitor project progress, identify bottlenecks, and maintain comprehensive audit trails.",
+          "👇 **Click the tabs below to explore the target audience and use cases.**",
       },
-      { type: "heading", level: 3, content: "Compliance Officers" },
       {
-        type: "text",
-        content:
-          "Ensure regulatory compliance with detailed change tracking and audit capabilities.",
+        type: "tabbed-section",
+        tabs: [
+          {
+            id: "target-audience",
+            label: "Target Audience",
+            content: {
+              intro:
+                "Here are the primary **audiences** who benefit from Issue Change Log:",
+              items: [
+                {
+                  title: "Development Teams",
+                  description:
+                    "Track code changes, bug fixes, and feature progress with detailed histories.",
+                },
+                {
+                  title: "Project Managers",
+                  description:
+                    "Monitor milestones, identify workflow bottlenecks, and maintain accountability.",
+                },
+                {
+                  title: "Quality Assurance Teams",
+                  description:
+                    "Review testing cycles, verify bug resolutions, and ensure quality standards.",
+                },
+                {
+                  title: "Compliance and DevOps Teams",
+                  description:
+                    "Maintain audit trails, track deployments, and monitor release activities.",
+                },
+              ],
+            },
+          },
+          {
+            id: "use-cases",
+            label: "Use Cases",
+            content: {
+              intro:
+                "Here are some **key scenarios** where Issue Change Log adds value:",
+              items: [
+                {
+                  title: "Audit and Compliance",
+                  description:
+                    "Keeps detailed change records for audits and compliance.",
+                },
+                {
+                  title: "Root Cause Analysis",
+                  description: "Shows when and why changes occurred.",
+                },
+                {
+                  title: "Team Transparency",
+                  description: "Reveals who made each change.",
+                },
+                {
+                  title: "Quality Tracking",
+                  description: "Tracks issue progress and workflow efficiency.",
+                },
+              ],
+            },
+          },
+        ],
       },
-      { type: "heading", level: 3, content: "Quality Assurance Teams" },
       {
-        type: "text",
-        content:
-          "Review testing cycles, track bug resolutions, and verify issue lifecycle management.",
-      },
-      { type: "heading", level: 3, content: "DevOps Teams" },
-      {
-        type: "text",
-        content:
-          "Monitor deployment-related changes, track release cycles, and maintain operational visibility.",
-      },
-      { type: "heading", level: 2, content: "Use Cases" },
-      { type: "heading", level: 3, content: "Audit and Compliance" },
-      {
-        type: "text",
-        content:
-          "Maintain detailed records of all issue modifications for compliance requirements (SOC 2, ISO 27001, GDPR, etc.).",
-      },
-      { type: "heading", level: 3, content: "Root Cause Analysis" },
-      {
-        type: "text",
-        content:
-          "Investigate when and why specific changes were made to identify issues or process improvements.",
-      },
-      { type: "heading", level: 3, content: "Team Transparency" },
-      {
-        type: "text",
-        content:
-          "Provide visibility into who made what changes and when, fostering accountability and collaboration.",
-      },
-      { type: "heading", level: 3, content: "Quality Tracking" },
-      {
-        type: "text",
-        content:
-          "Monitor how issues evolve through different stages and identify patterns in workflow efficiency.",
-      },
-      { type: "heading", level: 3, content: "Historical Analysis" },
-      {
-        type: "text",
+        type: "info-message-box",
+        title: "Historical Analysis",
         content:
           "Analyze patterns in issue modifications over time to improve processes and workflows.",
       },

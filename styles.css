@@ -783,6 +783,315 @@ body.sidebar-collapsed .sidebar-toggle svg {
   line-height: var(--line-height-body);
 }
 
+/* Gray background section after annotated image */
+.gray-background-section {
+  background-color: rgb(247, 248, 249);
+  margin-left: -40px;
+  margin-right: -40px;
+  padding: 80px 40px 80px 40px;
+  margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+  .gray-background-section {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding: 40px 20px 40px 20px;
+    margin-top: 24px;
+  }
+}
+
+/* Benefit Cards */
+.benefit-card {
+  background-color: #ffffff;
+  border: 1px solid #dfe1e6;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.benefit-card:hover {
+  box-shadow: 0 4px 8px rgba(9, 30, 66, 0.08), 0 0 1px rgba(9, 30, 66, 0.12);
+  border-color: #b3d4ff;
+}
+
+.benefit-card-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background-color: #deebff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0052cc;
+}
+
+.benefit-card-content {
+  flex: 1;
+}
+
+.benefit-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 12px 0;
+  line-height: 1.3;
+}
+
+.benefit-card-description {
+  font-size: 14px;
+  color: var(--text-medium);
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+}
+
+.benefit-card-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefit-card-highlights li {
+  font-size: 14px;
+  color: var(--text-medium);
+  line-height: 1.6;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background-color: #f4f5f7;
+  border-radius: 4px;
+  border-left: 3px solid #0052cc;
+}
+
+.benefit-card-highlights li strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .benefit-card {
+    flex-direction: column;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .benefit-card-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .benefit-card-title {
+    font-size: 16px;
+  }
+}
+
+/* Tabbed Section */
+.tabbed-section {
+  margin: 20px 0;
+}
+
+.tab-nav {
+  background: #ffffff;
+  border: 1px solid #dfe1e6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tab-list {
+  list-style-type: none;
+  border-bottom: none;
+  margin: 0;
+  margin-top: 0;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  overflow-x: auto;
+  background-color: #ffffff;
+}
+
+.tab-item {
+  display: inline-block;
+  position: relative;
+}
+
+.tab-button {
+  appearance: none;
+  background: transparent;
+  border: 1.5px solid #8590a2;
+  border-radius: 24px;
+  color: #172b4d;
+  cursor: pointer;
+  font-family: Charlie Text, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.42857142857143;
+  margin: 0;
+  padding: 8px 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  width: auto;
+  position: relative;
+}
+
+.tab-button:hover {
+  background-color: #f7f8f9;
+  border-color: #172b4d;
+  color: #172b4d;
+}
+
+.tab-button.active {
+  background-color: #1c2b41;
+  border-color: #1c2b41;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.tab-button.active::after {
+  display: none;
+}
+
+.tab-label {
+  display: block;
+  font-family: Charlie Text, sans-serif;
+}
+
+.tab-content-wrapper {
+  position: relative;
+  background-color: #ffffff;
+}
+
+.tab-content {
+  display: none;
+  padding: 32px 24px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-intro {
+  font-size: 16px;
+  color: var(--text-medium);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.tab-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-items-list.simple-bullets {
+  list-style: disc;
+  padding-left: 24px;
+  margin-left: 0;
+}
+
+.tab-item-bullet {
+  font-size: 16px;
+  color: var(--text-medium);
+  line-height: 1.8;
+  margin-bottom: 14px;
+  padding: 0;
+}
+
+.tab-item-bullet .tab-item-title {
+  display: inline;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.tab-item-card {
+  padding: 20px;
+  margin-bottom: 16px;
+  background-color: #f7f8f9;
+  border-left: 3px solid #0052cc;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.tab-item-card:hover {
+  background-color: #deebff;
+  box-shadow: 0 2px 4px rgba(9, 30, 66, 0.08);
+}
+
+.tab-item-card .tab-item-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 8px 0;
+  display: block;
+}
+
+.tab-item-description {
+  font-size: 14px;
+  color: var(--text-medium);
+  line-height: 1.6;
+  margin: 0 0 12px 0;
+}
+
+.tab-item-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.tab-item-benefits li {
+  font-size: 13px;
+  color: var(--text-medium);
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.tab-item-benefits li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #0052cc;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .tab-content {
+    padding: 24px 16px;
+  }
+
+  .tab-item-card {
+    padding: 16px;
+  }
+}
+
 /* Hero (Twilio-like) */
 .hero {
   display: grid;
@@ -1061,6 +1370,80 @@ body.sidebar-collapsed .sidebar-toggle svg {
   left: 8px;
   color: #0052cc;
   font-weight: bold;
+}
+
+/* Info Message Box (Atlassian style) */
+.info-message-box {
+  margin: 0;
+  padding: 0;
+  padding-bottom: 40px;
+  padding-top: 20px;
+  justify-content: center;
+  width: 100%;
+  display: flex;
+}
+
+.info-message-content {
+  background-color: #ffffff;
+  border: 1px solid #091e4224;
+  border-radius: 3px;
+  padding: 24px 32px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 80px;
+}
+
+.info-message-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1d7afc;
+}
+
+.info-message-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.info-message-icon path {
+  fill: #1d7afc;
+}
+
+.info-message-icon rect,
+.info-message-icon circle {
+  fill: #ffffff;
+}
+
+.info-message-text {
+  flex: 1;
+  font-family: Charlie Text, sans-serif;
+}
+
+.info-message-title {
+  margin: 0 0 8px 0 !important;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #172b4d;
+}
+
+.info-message-text p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #172b4d;
+}
+
+.info-message-text a {
+  color: #0c66e4;
+  text-decoration: none;
+}
+
+.info-message-text a:hover {
+  color: #0055cc;
+  text-decoration: underline;
 }
 
 /* Info Box */
@@ -1524,8 +1907,8 @@ pre code {
   height: auto;
   display: block;
   border-radius: 8px;
-  box-shadow: 0px 1px 1px rgba(9, 30, 66, 0.25),
-    0px 0px 1px rgba(9, 30, 66, 0.31);
+  box-shadow: 0px 4px 8px rgba(9, 30, 66, 0.15),
+    0px 0px 1px rgba(9, 30, 66, 0.31), 0px 8px 16px rgba(9, 30, 66, 0.08);
 }
 
 .annotation-tag {
@@ -1549,7 +1932,139 @@ pre code {
     0px 0px 1px rgba(9, 30, 66, 0.31);
   border: 2px solid #ffffff;
   z-index: 10;
-  cursor: default;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.annotation-tag:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0px 8px 16px rgba(9, 30, 66, 0.25),
+    0px 0px 1px rgba(9, 30, 66, 0.41);
+}
+
+.annotation-tag.active {
+  background-color: #0c66e4;
+  color: #ffffff;
+  border-color: #0c66e4;
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0px 8px 16px rgba(12, 102, 228, 0.3),
+    0px 0px 1px rgba(12, 102, 228, 0.5), 0 0 20px rgba(12, 102, 228, 0.4);
+}
+
+.annotation-tooltip-popup {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0px 8px 12px rgba(9, 30, 66, 0.15),
+    0px 0px 1px rgba(9, 30, 66, 0.31);
+  padding: 16px;
+  min-width: 200px;
+  max-width: 300px;
+  z-index: 1000;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+.annotation-tooltip-popup::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-bottom-color: #ffffff;
+  filter: drop-shadow(0px -2px 2px rgba(9, 30, 66, 0.1));
+}
+
+.annotation-tooltip-popup .tooltip-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: #172b4d;
+}
+
+.annotation-tooltip-popup .tooltip-content p {
+  margin: 0;
+}
+
+.annotation-tooltip-popup .tooltip-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #172b4d;
+  margin-bottom: 8px;
+  line-height: 1.42857;
+}
+
+.annotation-tooltip-popup .tooltip-description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #626f86;
+  line-height: 1.42857;
+}
+
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #091e4224;
+}
+
+.tooltip-counter {
+  font-size: 12px;
+  font-weight: 600;
+  color: #44546f;
+}
+
+.tooltip-nav-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.tooltip-nav-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #44546f;
+  transition: background-color 0.2s ease;
+}
+
+.tooltip-nav-btn:hover:not(:disabled) {
+  background-color: #091e420f;
+}
+
+.tooltip-nav-btn:active:not(:disabled) {
+  background-color: #091e4224;
+}
+
+.tooltip-nav-btn:disabled {
+  color: #091e424f;
+  cursor: not-allowed;
+}
+
+.tooltip-nav-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .annotation-line {

@@ -115,13 +115,65 @@ function loadSectionContent(sectionId) {
   const articleContent = document.getElementById("articleContent");
   const heroHtml =
     content.layout === "hero" ? buildHero(content.hero || {}, content) : "";
+
+  // Find the index of the annotated-image section
+  const annotatedImageIndex = content.sections.findIndex(
+    (s) => s.type === "annotated-image"
+  );
+  const hasAnnotatedImage = annotatedImageIndex !== -1;
+
   articleContent.innerHTML =
     heroHtml +
     content.sections
-      .map((section) => {
+      .map((section, index) => {
+        // Add gray background wrapper after annotated image
+        const isAfterAnnotatedImage =
+          hasAnnotatedImage && index === annotatedImageIndex + 1;
+        const prefix = isAfterAnnotatedImage
+          ? '<div class="gray-background-section">'
+          : "";
+
+        // End gray section after info-message-box (Historical Analysis)
+        const isInfoMessageBox = section.type === "info-message-box";
+        const isLastSection = index === content.sections.length - 1;
+        const suffix =
+          hasAnnotatedImage &&
+          index >= annotatedImageIndex + 1 &&
+          (isLastSection || isInfoMessageBox)
+            ? "</div>"
+            : "";
+
+        let sectionHtml = "";
         switch (section.type) {
+          case "info-message-box":
+            sectionHtml = `
+            <div class="info-message-box">
+              <div class="info-message-content">
+                <div class="info-message-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" role="presentation">
+                    <g fill-rule="evenodd">
+                      <path fill="currentColor" d="M2 12c0 5.523 4.477 10 10 10s10-4.477 10-10S17.523 2 12 2 2 6.477 2 12"></path>
+                      <rect width="2" height="7" x="11" y="10" fill="inherit" rx="1"></rect>
+                      <circle cx="12" cy="8" r="1" fill="inherit"></circle>
+                    </g>
+                  </svg>
+                </div>
+                <div class="info-message-text">
+                  ${
+                    section.title
+                      ? `<p class="info-message-title"><strong>${parseMarkdown(
+                          section.title
+                        )}</strong></p>`
+                      : ""
+                  }
+                  <p>${parseMarkdown(section.content)}</p>
+                </div>
+              </div>
+            </div>
+          `;
+            break;
           case "info-box":
-            return `
+            sectionHtml = `
             <div class="info-box">
               <svg class="info-icon" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
@@ -133,8 +185,9 @@ function loadSectionContent(sectionId) {
               </div>
             </div>
           `;
+            break;
           case "warning-box":
-            return `
+            sectionHtml = `
             <div class="warning-box">
               <svg class="warning-icon" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2L2 20h20L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -146,22 +199,25 @@ function loadSectionContent(sectionId) {
               </div>
             </div>
           `;
+            break;
           case "heading":
             const headingId = section.content
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, "-")
               .replace(/^-|-$/g, "");
-            return `<h${
+            sectionHtml = `<h${
               section.level
             } class="content-heading" id="${headingId}">${parseMarkdown(
               section.content
             )}</h${section.level}>`;
+            break;
           case "text":
-            return `<div class="text-content"><p>${parseMarkdown(
+            sectionHtml = `<div class="text-content"><p>${parseMarkdown(
               section.content
             )}</p></div>`;
+            break;
           case "objectives-banner":
-            return `
+            sectionHtml = `
             <div class="objectives-banner">
               ${
                 section.pageTitle
@@ -199,25 +255,28 @@ function loadSectionContent(sectionId) {
               </ul>
             </div>
           `;
+            break;
           case "list":
             const listClass = section.className
               ? `content-list ${section.className}`
               : "content-list";
-            return `
+            sectionHtml = `
             <ul class="${listClass}">
               ${section.items
                 .map((item) => `<li>${parseMarkdown(item)}</li>`)
                 .join("")}
             </ul>
           `;
+            break;
           case "image":
-            return `
+            sectionHtml = `
             <div class="content-image">
               <img src="${section.src}" alt="${section.alt}" onerror="this.parentElement.innerHTML='<div style=\\'padding:100px;text-align:center;background:#f4f5f7;color:#6b778c;\\'>Image placeholder: ${section.alt}</div>'">
             </div>
           `;
+            break;
           case "annotated-image":
-            return `
+            sectionHtml = `
             <div class="annotated-image-container">
               <img src="${section.src}" alt="${section.alt}">
               ${
@@ -236,9 +295,14 @@ function loadSectionContent(sectionId) {
                 }
                 <div class="annotation-tag" style="left: ${
                   annotation.x
-                }%; top: ${annotation.y}%; transform: translate(-50%, -50%);">${
-                          annotation.number
-                        }</div>
+                }%; top: ${annotation.y}%; transform: translate(-50%, -50%);" 
+                data-tooltip-title="${annotation.tooltipTitle || ""}" 
+                data-tooltip-description="${
+                  annotation.tooltipDescription || ""
+                }" 
+                onclick="toggleAnnotationTooltip(this)">${
+                  annotation.number
+                }</div>
               `
                       )
                       .join("")
@@ -246,9 +310,66 @@ function loadSectionContent(sectionId) {
               }
             </div>
           `;
+            break;
+          case "tabbed-section":
+            const firstTab = section.tabs[0];
+            sectionHtml = `
+            <div class="tabbed-section">
+              <div class="tab-nav">
+                <ul class="tab-list">
+                  ${section.tabs
+                    .map(
+                      (tab, index) => `
+                    <li class="tab-item ${
+                      index === 0 ? "active" : ""
+                    }" data-tab="${tab.id}">
+                      <button class="tab-button ${
+                        index === 0 ? "active" : ""
+                      }" onclick="switchTab('${tab.id}')">
+                        <span class="tab-label">${tab.label}</span>
+                      </button>
+                    </li>
+                  `
+                    )
+                    .join("")}
+                </ul>
+                <div class="tab-content-wrapper">
+                  ${section.tabs
+                    .map(
+                      (tab, index) => `
+                    <div class="tab-content ${
+                      index === 0 ? "active" : ""
+                    }" id="tab-${tab.id}">
+                      <p class="tab-intro">${parseMarkdown(
+                        tab.content.intro
+                      )}</p>
+                      <ul class="tab-items-list simple-bullets">
+                        ${tab.content.items
+                          .map(
+                            (item) => `
+                          <li class="tab-item-bullet">
+                            <strong class="tab-item-title">${parseMarkdown(
+                              item.title
+                            )}</strong>: ${parseMarkdown(item.description)}
+                          </li>
+                        `
+                          )
+                          .join("")}
+                      </ul>
+                    </div>
+                  `
+                    )
+                    .join("")}
+                </div>
+              </div>
+            </div>
+          `;
+            break;
           default:
-            return "";
+            sectionHtml = "";
         }
+
+        return prefix + sectionHtml + suffix;
       })
       .join("");
 
@@ -1441,6 +1562,126 @@ function initializeSaveAsPdfButton() {
       }
     }
   });
+}
+
+// Annotation tooltip toggle function
+function toggleAnnotationTooltip(element) {
+  const tooltipTitle = element.getAttribute("data-tooltip-title");
+  const tooltipDescription = element.getAttribute("data-tooltip-description");
+  if (!tooltipTitle && !tooltipDescription) return;
+
+  // Remove active class from all tags and close their tooltips
+  document.querySelectorAll(".annotation-tag").forEach((tag) => {
+    tag.classList.remove("active");
+    const popup = tag.querySelector(".annotation-tooltip-popup");
+    if (popup) {
+      popup.remove();
+    }
+  });
+
+  // Check if this element already has a tooltip (was just closed above)
+  const existingTooltip = element.querySelector(".annotation-tooltip-popup");
+  if (existingTooltip) {
+    element.classList.remove("active");
+    existingTooltip.remove();
+    return;
+  }
+
+  // Add active class to current tag
+  element.classList.add("active");
+
+  // Get all annotation tags to navigate between them
+  const allTags = Array.from(document.querySelectorAll(".annotation-tag"));
+  const currentIndex = allTags.indexOf(element);
+  const totalTags = allTags.length;
+  const currentNumber = currentIndex + 1;
+
+  // Create tooltip popup
+  const tooltipPopup = document.createElement("div");
+  tooltipPopup.className = "annotation-tooltip-popup";
+  tooltipPopup.innerHTML = `
+    <div class="tooltip-header">
+      <span class="tooltip-counter">${currentNumber}/${totalTags}</span>
+      <div class="tooltip-nav-buttons">
+        <button class="tooltip-nav-btn tooltip-prev" ${
+          currentIndex === 0 ? "disabled" : ""
+        } onclick="event.stopPropagation(); navigateTooltip(${
+    currentIndex - 1
+  })">
+          <svg width="24" height="24" viewBox="0 0 24 24" role="presentation">
+            <path fill="currentColor" fill-rule="evenodd" d="M13.706 9.698a.99.99 0 0 0 0-1.407 1.01 1.01 0 0 0-1.419 0l-2.965 2.94a1.09 1.09 0 0 0 0 1.548l2.955 2.93a1.01 1.01 0 0 0 1.42 0 .99.99 0 0 0 0-1.407l-2.318-2.297z"></path>
+          </svg>
+        </button>
+        <button class="tooltip-nav-btn tooltip-next" ${
+          currentIndex === totalTags - 1 ? "disabled" : ""
+        } onclick="event.stopPropagation(); navigateTooltip(${
+    currentIndex + 1
+  })">
+          <svg width="24" height="24" viewBox="0 0 24 24" role="presentation">
+            <path fill="currentColor" fill-rule="evenodd" d="M10.294 9.698a.99.99 0 0 1 0-1.407 1.01 1.01 0 0 1 1.419 0l2.965 2.94a1.09 1.09 0 0 1 0 1.548l-2.955 2.93a1.01 1.01 0 0 1-1.42 0 .99.99 0 0 1 0-1.407l2.318-2.297z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="tooltip-content">
+      ${tooltipTitle ? `<p class="tooltip-title">${tooltipTitle}</p>` : ""}
+      ${
+        tooltipDescription
+          ? `<p class="tooltip-description">${tooltipDescription}</p>`
+          : ""
+      }
+    </div>
+  `;
+
+  element.appendChild(tooltipPopup);
+
+  // Close tooltip when clicking outside
+  setTimeout(() => {
+    document.addEventListener("click", function closeTooltip(e) {
+      if (!element.contains(e.target)) {
+        element.classList.remove("active");
+        tooltipPopup.remove();
+        document.removeEventListener("click", closeTooltip);
+      }
+    });
+  }, 0);
+}
+
+// Navigate to a different tooltip
+function navigateTooltip(index) {
+  const allTags = document.querySelectorAll(".annotation-tag");
+  if (allTags[index]) {
+    // Close current tooltip
+    document
+      .querySelectorAll(".annotation-tooltip-popup")
+      .forEach((popup) => popup.remove());
+    // Open new tooltip
+    toggleAnnotationTooltip(allTags[index]);
+  }
+}
+
+// Switch between tabs in tabbed section
+function switchTab(tabId) {
+  // Get all tab buttons and contents
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabItems = document.querySelectorAll(".tab-item");
+  const tabContents = document.querySelectorAll(".tab-content");
+
+  // Remove active class from all
+  tabButtons.forEach((btn) => btn.classList.remove("active"));
+  tabItems.forEach((item) => item.classList.remove("active"));
+  tabContents.forEach((content) => content.classList.remove("active"));
+
+  // Add active class to selected tab
+  const selectedButton = document.querySelector(
+    `[data-tab="${tabId}"] .tab-button`
+  );
+  const selectedItem = document.querySelector(`[data-tab="${tabId}"]`);
+  const selectedContent = document.getElementById(`tab-${tabId}`);
+
+  if (selectedButton) selectedButton.classList.add("active");
+  if (selectedItem) selectedItem.classList.add("active");
+  if (selectedContent) selectedContent.classList.add("active");
 }
 
 // Initialize version dropdown when page loads
